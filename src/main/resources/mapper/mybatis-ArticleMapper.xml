@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>   
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.codinggyd.mapper.ArticleMapper">
+ 	<resultMap id="consts" type="com.codinggyd.bean.ArticleType">
+		<id column="id" property="id" />
+		<result column="lb" property="lb" />
+		<result column="lbmc" property="lbmc" />
+		<result column="dm" property="dm" />
+		<result column="ms" property="ms" />
+		<result column="updatetime" property="updatetime" />
+	</resultMap>
+	<resultMap id="articles" type="com.codinggyd.bean.Article">
+		<id column="id" property="id" />
+		<result column="title" property="title" />
+		<result column="descs" property="descs" />
+		<result column="updatetime" property="updatetime" />
+		<result column="readingcount" property="readingcount" />
+		<result column="url" property="url" />
+		<result column="type" property="type" />
+	</resultMap>
+	
+	<select id="listArticleType" resultMap="consts">
+ 		SELECT 	id,lb,lbmc,dm,ms,updatetime 
+ 				FROM mine_sysconst  
+ 				WHERE lb=100
+	</select>
+	 
+	<select id="queryArticle" resultType="com.codinggyd.bean.Article">
+		SELECT id,title,descs,updatetime,readingcount,url,type,htmlContent,content FROM mine_articles
+		WHERE id = #{id}
+	</select>
+	
+	<select id="findArticles" resultMap="articles">
+ 		SELECT 	A.id,title,descs,A.updatetime,readingcount,url,type,B.ms typeName
+ 				FROM mine_articles A 
+ 				INNER JOIN mine_sysconst B 
+ 				ON A.type = B.dm AND B.lb = '100' 
+ 				 
+				ORDER BY A.updatetime DESC
+	</select>
+	
+	<update id="updateArticle">
+		UPDATE mine_articles SET 
+						title = #{article.title},
+						descs = #{article.descs},
+						updatetime = #{article.updatetime},				
+						readingcount = #{article.readingcount},
+						type = #{article.type}
+		WHERE id = #{article.id}
+	</update>
+	
+	<update id="updateArticleContent">
+		UPDATE mine_articles SET 
+						title = #{article.title},
+						descs = #{article.descs},
+						content= #{article.content},
+						htmlContent = #{article.htmlContent},
+						updatetime = #{article.updatetime},				
+ 						type = #{article.type}
+		WHERE id = #{article.id}
+	</update>
+	
+	
+	<insert id="insertArticle" useGeneratedKeys="true"  keyProperty="article.id" parameterType="com.codinggyd.bean.Article">
+	
+	    
+		  	INSERT INTO mine_articles 
+       				(title, descs, content,htmlContent,updatetime,readingcount,type)
+			VALUES(
+					#{article.title},
+					#{article.descs},
+					#{article.content},				
+					#{article.htmlContent},	
+					#{article.updatetime},				
+					#{article.readingcount},
+					#{article.type}
+			   ) 
+		</insert>
+		<update id="deleteArticle">
+			DELETE FROM mine_articles WHERE id = #{id}
+		</update>
+		
+</mapper>
